@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QFramework;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -87,6 +88,21 @@ public class MatchingpointPanelControl : AbstractButtonOpenPanel,IPanelItem
     void DropdownCallBack(int index)
     {
         dropdownindex = index;
+        QMsg usermsg = new PointMsg()
+        {
+            EventID = (int)Point_E.Userimport,
+            group = 2,
+            controllmode = index == 0 ? PointControll_E.ChoiseGroup : PointControll_E.AllDisplay
+        };
+        PointerManager.Instance.SendMsg(usermsg);
+        QMsg normalmsg = new PointMsg()
+        {
+            EventID = (int)Point_E.Normal,
+            group = 2,
+            controllmode = index == 0 ? PointControll_E.ChoiseGroup : PointControll_E.AllDisplay
+        };
+        PointerManager.Instance.SendMsg(normalmsg);
+
         //Enums.PointControll pcontroll = (Enums.PointControll)index;
         //MSGCenter.Execute(pcontroll.ToString(),choiseindex.ToString());
     }

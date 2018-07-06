@@ -27,6 +27,7 @@ public class NormalpointersController : AbstractPointscontroll
                 break;
             case PointControll_E.ChoiseGroup:
             case PointControll_E.AllDisplay:
+                RefreshDisplay(pm.controllmode, pm);
                 break;
             default:
                 break;
