@@ -4,7 +4,7 @@ using UnityEngine;
 using QFramework;
 using QFramework.Example;
 
-public class LenovoZhouTest : MonoBehaviour
+public class GameMain : MonoBehaviour
 {
 	void Start ()
     {

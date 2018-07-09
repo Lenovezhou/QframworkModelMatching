@@ -195,4 +195,19 @@ public class UserImportController : AbstractModelMain
         return Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject();
     }
 
+
+
+    protected override void AdjustmentChild(GameObject go, Material mat)
+    {
+        MeshRenderer[] renderers = go.GetComponentsInChildren<MeshRenderer>();
+
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            renderers[i].material = mat;
+            renderers[i].gameObject.AddComponent<MeshCollider>();
+            renderers[i].tag = selftag;
+        }
+
+    }
+
 }

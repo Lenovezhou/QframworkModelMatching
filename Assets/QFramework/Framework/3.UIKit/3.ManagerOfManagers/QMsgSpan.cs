@@ -22,7 +22,8 @@ namespace QFramework
         public const int Mouse = Camera + QMsgSpan.Count;
         public const int Model = Mouse + QMsgSpan.Count;
         public const int Pointer = Model + QMsgSpan.Count;
-        public const int FrameworkEnded = Pointer + QMsgSpan.Count;
+        public const int Avoid = Pointer + QMsgSpan.Count;
+        public const int FrameworkEnded = Avoid + QMsgSpan.Count;
 		public const int FrameworkMsgModuleCount = 7;
 	}
 }

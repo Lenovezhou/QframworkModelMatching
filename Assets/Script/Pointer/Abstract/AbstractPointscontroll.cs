@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AbstractPointscontroll : MonoBehaviour
+public abstract class AbstractPointscontroll : MonoBehaviour
 {
     /// <summary>
     /// 可添加的pointergizmo类型
@@ -10,9 +10,31 @@ public class AbstractPointscontroll : MonoBehaviour
     protected Tool.PointMode selfpointmode;
 
     /// <summary>
+    /// 观察相机
+    /// </summary>
+    protected Camera selfcamera;
+
+    /// <summary>
+    /// 当前控制状态
+    /// </summary>
+    protected  PointControll_E currentmode;
+
+    /// <summary>
     /// 点数据
     /// </summary>
     protected Dictionary<int, Dictionary<int, AbstractGizmoPointer>> pointmap;
+
+
+    /// <summary>
+    /// 当前控制组
+    /// </summary>
+    protected int currentgroup = -1;
+
+    /// <summary>
+    /// 当前控制序号
+    /// </summary>
+    protected int currentindex = -1;
+
 
     /// <summary>
     /// 构造函数决定自己添加gizmopointer类型
@@ -31,48 +53,46 @@ public class AbstractPointscontroll : MonoBehaviour
     protected virtual void LoadPointer(Transform parent, Dictionary<int, Dictionary<int, Vector3>> pointsmap)
     {
         transform.SetParent(parent);
-        if (null == pointmap)
-        {
-            pointmap = new Dictionary<int, Dictionary<int, AbstractGizmoPointer>>();
-        }
+        pointmap = new Dictionary<int, Dictionary<int, AbstractGizmoPointer>>();
         foreach (KeyValuePair<int, Dictionary<int, Vector3>> item in pointsmap)
         {
             Dictionary<int, Vector3> templist = item.Value;
             Dictionary<int, AbstractGizmoPointer> tempdic = new Dictionary<int, AbstractGizmoPointer>();
             List<Transform> tempgos = new List<Transform>();
-
             foreach (KeyValuePair<int, Vector3> it in item.Value)
             {
-                GameObject g = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                //g.transform.localScale = Vector3.one * 3;
-                g.transform.SetParent(transform,false);
-                g.transform.localPosition = it.Value;
-                //g.SetActive(false);
                 int group = item.Key;
                 int index = it.Key;
                 float s = 0.3f / 0.1f;
                 Vector3 finalscaler = Vector3.one * s;
+                GameObject g = SpawnGizmo(group, index, it.Value, transform);
 
-                AbstractGizmoPointer p = null;
-                switch (selfpointmode)
-                {
-                    case Tool.PointMode.Normal:
-                        p = g.AddComponent<NormalGizmoPointer>();
-                        break;
-                    case Tool.PointMode.UserImport:
-                        p = g.AddComponent<UserGizmoPointer>();
-                        break;
-                    default:
-                        break;
-                }
-                p.Init(group, index, finalscaler);
                 Destroy(g.GetComponent<Collider>());
                 tempgos.Add(g.transform);
-                tempdic.Add(index, p);
+                tempdic.Add(index, g.GetComponent<AbstractGizmoPointer>());
+
+                SaveGizmo();
+
             }
             pointmap.Add(item.Key, tempdic);
         }
     }
+
+    /// <summary>
+    /// 生成gizmo
+    /// </summary>
+    /// <param name="group">组</param>
+    /// <param name="index">序号</param>
+    /// <param name="pos">坐标</param>
+    /// <param name="parent">父级</param>
+    /// <returns></returns>
+    protected abstract GameObject SpawnGizmo(int group, int index, Vector3 pos, Transform parent);
+
+    /// <summary>
+    /// 保存当前点
+    /// </summary>
+    protected virtual void SaveGizmo() { }
+
 
     /// <summary>
     /// 接收到通知
@@ -85,7 +105,7 @@ public class AbstractPointscontroll : MonoBehaviour
     /// </summary>
     /// <param name="group">组</param>
     /// <param name="index">序号</param>
-    private AbstractGizmoPointer CheckChoise(int group, int index)
+    protected AbstractGizmoPointer CheckChoise(int group, int index)
     {
         foreach (KeyValuePair<int, Dictionary<int, AbstractGizmoPointer>> item in pointmap)
         {
@@ -120,25 +140,32 @@ public class AbstractPointscontroll : MonoBehaviour
                 Refreshdis(pm.group);
                 break;
             case PointControll_E.AllDisplay:
-                Refreshdis(-1);
+                Refreshdis(allactive: true);
                 break;
             default:
                 break;
         }
     }
 
-    private void Refreshdis(int index)
+    private void Refreshdis(int index = -1,bool allactive = false)
     {
         foreach (KeyValuePair<int, Dictionary<int, AbstractGizmoPointer>> item in pointmap)
         {
             foreach (KeyValuePair<int, AbstractGizmoPointer> it in item.Value)
             {
-                if (it.Value.IsMe(index, it.Key))
+                if (!allactive)
                 {
-                    it.Value.Display();
+                    if (it.Value.IsMe(index, it.Key))
+                    {
+                        it.Value.Display();
+                    }
+                    else
+                    {
+                        it.Value.Hidden();
+                    }
                 }
                 else {
-                    it.Value.Hidden();
+                    it.Value.Display();
                 }
             }
         }

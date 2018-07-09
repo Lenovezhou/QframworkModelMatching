@@ -20,6 +20,11 @@ public abstract class AbstractModelMain :MonoBehaviour
     protected float selforiginscaler;
 
     /// <summary>
+    /// 所属tag
+    /// </summary>
+    public string selftag;
+
+    /// <summary>
     /// 加载模型
     /// </summary>
     /// <param name="stlpath"></param>
@@ -77,9 +82,10 @@ public abstract class AbstractModelMain :MonoBehaviour
     /// 初始化
     /// </summary>
     /// <param name="pm"></param>
-    public void Init(Tool.PointMode pm,Camera _selfcamera =null)
+    public void Init(Tool.PointMode pm,string tag)
     {
         this.SelfPointMode = pm;
+        this.selftag = tag;
     }
 
 

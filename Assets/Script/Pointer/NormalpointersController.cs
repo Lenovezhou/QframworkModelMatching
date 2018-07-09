@@ -16,6 +16,8 @@ public class NormalpointersController : AbstractPointscontroll
 
         switch (pm.controllmode)
         {
+            case PointControll_E.Edit:
+                break;
             case PointControll_E.SaveMatchingpoint:
                 break;
             case PointControll_E.Cancle:
@@ -34,4 +36,20 @@ public class NormalpointersController : AbstractPointscontroll
         }
     }
 
+    protected override GameObject SpawnGizmo(int group, int index, Vector3 pos, Transform parent)
+    {
+        GameObject g = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        g.transform.SetParent(transform, false);
+        g.transform.localPosition = pos;
+        float s = 0.3f / 0.1f;
+        Vector3 finalscaler = Vector3.one * s;
+
+        AbstractGizmoPointer p = null;
+        p = g.AddComponent<NormalGizmoPointer>();
+
+        p.Init(group, index, finalscaler);
+        Destroy(g.GetComponent<Collider>());
+
+        return g;
+    }
 }

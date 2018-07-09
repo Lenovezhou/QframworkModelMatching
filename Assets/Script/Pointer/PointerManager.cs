@@ -14,12 +14,15 @@ public enum Point_E
 
 public enum PointControll_E
 {
+    Ido,
+    Edit,
     SaveMatchingpoint,
     Cancle,
     AutoNext,
     Load,
     ChoiseGroup,
-    AllDisplay
+    AllDisplay,
+    SetCamra
 }
 
 
@@ -33,6 +36,7 @@ public class PointMsg : QMsg
     public Dictionary<int, Dictionary<int, Vector3>> pointsmap;
     public int group;
     public int index;
+    public Camera selfcamra;
 }
 
 

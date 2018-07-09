@@ -85,8 +85,8 @@ public class ModelManager : QMgrBehaviour, ISingleton
         userimportcontroller = userimprot.GetComponent<AbstractModelMain>();
         normalmodelcontroller = normal.GetComponent<AbstractModelMain>();
 
-        userimportcontroller.Init(Tool.PointMode.UserImport);
-        normalmodelcontroller.Init(Tool.PointMode.Normal);
+        userimportcontroller.Init(Tool.PointMode.UserImport,Tool.userimporttag);
+        normalmodelcontroller.Init(Tool.PointMode.Normal,Tool.normaltag);
     }
 
 

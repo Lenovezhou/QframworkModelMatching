@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using QFramework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ public class MatchingItemButton : MonoBehaviour {
     [SerializeField]
     int index = -1;
     string laststate;
+    Color buttonorigincolor;
     Color nomatchingcolor = Color.red;
     Color matchingcolor = Color.yellow;
     Color matchingDoneColor = Color.green;
@@ -36,15 +38,17 @@ public class MatchingItemButton : MonoBehaviour {
     void CheckChildAssigne ()
     {
         selfbutton = GetComponentInChildren<Button>();
+        buttonorigincolor = transform.GetComponent<Image>().color;
         selfstatetext = transform.Find("StateText").GetComponentInChildren<Text>();
         selfstatetext.text = nomatchingstr;
         selfstatetext.color = nomatchingcolor;
         laststate = selfstatetext.text;
+        selfbutton.onClick.RemoveAllListeners();
         selfbutton.onClick.AddListener(OnEditHit);
 	}
 
 
-    public void OnEditHit()
+    private void OnEditHit()
     {
         if (null == selfstatetext)
         {
@@ -55,25 +59,27 @@ public class MatchingItemButton : MonoBehaviour {
         selfstatetext.text = matchingstr;
         selfstatetext.color = matchingcolor;
         selfbutton.GetComponent<Image>().color = Color.black;
-        //MSGCenter.Execute(Enums.LeftMouseButtonControl.AddMatchingGizmo.ToString(), "True*" + group + "*" + index);
-        //MSGCenter.Execute(Enums.MatchigPointGizmoControll.Highlight.ToString());
+
+        
+
+        //发送到pointmanager-->>>>
+        Send(PointControll_E.Edit);
     }
 
 
-    public void SaveMatchingpoint()
+    private void SaveMatchingpoint()
     {
         if (null == selfstatetext)
         {
             CheckChildAssigne();
         }
         hassaved = true;
-        DotweenColor(transform.GetComponent<Image>(), new Color(1, 1, 1, 0.4f), Color.red);
+        DotweenColor(transform.GetComponent<Image>(), Color.white, Color.red);
         selfstatetext.text = matchingdonestr;
         selfstatetext.color = matchingDoneColor;
-        selfbutton.GetComponent<Image>().color = Color.white;
     }
 
-    public void Cancle()
+    private void Cancle()
     {
         hassaved = false;
         if (selfstatetext)
@@ -84,7 +90,18 @@ public class MatchingItemButton : MonoBehaviour {
         }
     }
 
-    
+
+    //封装发送
+    private void Send(PointControll_E pcontroller)
+    {
+        QMsg normalmsg = new PointMsg() { EventID = (int)Point_E.Normal, controllmode = pcontroller, group = this.group, index = this.index };
+        PointerManager.Instance.SendMsg(normalmsg);
+        QMsg usermsg = new PointMsg() { EventID = (int)Point_E.Userimport, controllmode = pcontroller, group = this.group, index = this.index };
+        PointerManager.Instance.SendMsg(usermsg);
+
+    }
+
+
     public void CheckMeNeedCancle()
     {
         if (hassaved)
@@ -114,5 +131,21 @@ public class MatchingItemButton : MonoBehaviour {
         seq.OnComplete(() => { _image.color = normal; });
     }
 
-  
+
+    public void HandleEvent(PointControll_E pcontroller)
+    {
+        switch (pcontroller)
+        {
+            case PointControll_E.SaveMatchingpoint:
+                SaveMatchingpoint();
+                break;
+            case PointControll_E.Cancle:
+                Cancle();
+                break;
+            case PointControll_E.AutoNext:
+                break;
+            default:
+                break;
+        }
+    }
 }

@@ -31,6 +31,26 @@ public class PlayerDataCenter :MonoBehaviour,ISingleton
             return currentuserpointmap;
         }
     }
+
+    /// <summary>
+    /// 保存单个点调用
+    /// </summary>
+    /// <param name="group">所在组</param>
+    /// <param name="index">所在序列号</param>
+    /// <param name="localposition">本地坐标</param>
+    public void FillCurrentuserpointmap(int group,int index,Vector3 localposition)
+    {
+        if (!currentuserpointmap.ContainsKey(group))
+        {
+            currentuserpointmap.Add(group, new Dictionary<int, Vector3>());
+        }
+        if (!currentuserpointmap[group].ContainsKey(index))
+        {
+            currentuserpointmap[group].Add(index, localposition);
+        }
+        currentuserpointmap[group][index] = localposition;
+    }
+    
     /// <summary>
     /// 标准点
     /// </summary>
@@ -75,6 +95,16 @@ public class PlayerDataCenter :MonoBehaviour,ISingleton
 
             return materialmap;
         }
+    }
+
+
+    /// <summary>
+    /// 全部保存并提交到服务器，准备获取下载模型
+    /// </summary>
+    public void SaveAll()
+    {
+        //发送所有点数据到服务器，记录本地偏好设置到json文件中
+
     }
 
 

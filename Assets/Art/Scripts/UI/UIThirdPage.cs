@@ -108,12 +108,7 @@ namespace QFramework.Example
             //提交
             CommitButton.onClick.AddListener(() =>
             {
-                //①序列化当前数据
-                //PointHelper.GetInstance().SaveAll();
-
-                //②将现在的所有数据提交到web
-
-
+                PlayerDataCenter.Instance.SaveAll();
             });
         }
 

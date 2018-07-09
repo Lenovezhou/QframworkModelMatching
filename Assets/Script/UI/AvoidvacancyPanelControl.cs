@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using QFramework;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,6 +21,7 @@ public class AvoidvacancyPanelControl : AbstractButtonOpenPanel,IPanelItem
     public void OnLeveThisPage()
     {
         transform.Find("Panel (2)").gameObject.SetActive(false);
+        UnspawnAll();
         //Enums.AvoidvacancyControll ac = Enums.AvoidvacancyControll.InactiveAll;
         //MSGCenter.Execute(ac.ToString());
 
@@ -31,27 +33,29 @@ public class AvoidvacancyPanelControl : AbstractButtonOpenPanel,IPanelItem
     {
         GameObject prefab = transform.Find("Panel/Scroll View/Viewport/Content/AvoidvacancyItem").gameObject;
         Transform parent = prefab.transform.parent;
+
+        InitPool(10, prefab);
+
         transform.Find("Panel/AddButton").GetComponent<Button>().onClick.AddListener(() => 
         {
-           GameObject go = SpawnChildren(prefab);
+            GameObject go = SpawnChildren(SpawnChild.FirstPoolItem,parent);
             int index = go.transform.parent.childCount - 2;
 
-            //添加
+            //添加(只表现在UI上)
             childmap.Add(index, go);
-            //MSGCenter.Execute(Enums.AvoidvacancyControll.Add.ToString(), index.ToString());
             go.GetComponentInChildren<Text>().text = "第" + (index + 1) + "个避空位";
             //删除
             go.transform.Find("Button").GetComponent<Button>().onClick.AddListener(() =>
             {
                 Destroy(go);
                 childmap.Remove(index);
-               // MSGCenter.Execute(Enums.AvoidvacancyControll.Remove.ToString(),index.ToString());
+                Send(AvoidControll_E.Remove, index);
             });
             //编辑
             go.transform.Find("Button (1)").GetComponent<Button>().onClick.AddListener(() =>
             {
                 transform.Find("Panel (2)").gameObject.SetActive(true);
-                //MSGCenter.Execute(Enums.AvoidvacancyControll.Edit.ToString(), index.ToString());
+                Send(AvoidControll_E.Edit, index);
                 if (lastchoise == index)
                 {
                     return;
@@ -66,24 +70,24 @@ public class AvoidvacancyPanelControl : AbstractButtonOpenPanel,IPanelItem
             //显示/隐藏
             go.transform.Find("Toggle").GetComponent<Toggle>().onValueChanged.AddListener((iSon) => 
             {
-               // Enums.AvoidvacancyControll ac = Enums.AvoidvacancyControll.Active;
+                AvoidControll_E ace = AvoidControll_E.DisplaySingle;
                 if (!iSon)
                 {
-                    //ac = Enums.AvoidvacancyControll.Inactive;
+                    ace = AvoidControll_E.HiddenSingle;
                 }
-                //MSGCenter.Execute(ac.ToString(), index.ToString());
+                Send(ace, index);
             });
         });
 
         //隐藏/显示全部
         transform.Find("Panel/AllToggle").GetComponent<Toggle>().onValueChanged.AddListener((iSon) => 
         {
-            //Enums.AvoidvacancyControll ac = Enums.AvoidvacancyControll.ActiveAll;
+            AvoidControll_E ace = AvoidControll_E.DisplayAll;
             if (!iSon)
             {
-               // ac = Enums.AvoidvacancyControll.InactiveAll;
+                ace = AvoidControll_E.HiddenAll;
             }
-            //MSGCenter.Execute(ac.ToString());
+            Send(ace);
         });
 
 
@@ -91,13 +95,13 @@ public class AvoidvacancyPanelControl : AbstractButtonOpenPanel,IPanelItem
         transform.Find("Panel (2)/Button").GetComponent<Button>().onClick.AddListener(() =>
         {
             transform.Find("Panel (2)").gameObject.SetActive(false);
-           // MSGCenter.Execute(Enums.AvoidvacancyControll.SaveAvoid.ToString());
+            Send(AvoidControll_E.Save);
         });
         //取消
         transform.Find("Panel (2)/Button (1)").GetComponent<Button>().onClick.AddListener(() =>
         {
             transform.Find("Panel (2)").gameObject.SetActive(false);
-           // MSGCenter.Execute(Enums.AvoidvacancyControll.Remove.ToString());
+            Send(AvoidControll_E.Cancle);
         });
         //重置
         transform.Find("Panel (2)/Button (2)").GetComponent<Button>().onClick.AddListener(() => 
@@ -107,6 +111,14 @@ public class AvoidvacancyPanelControl : AbstractButtonOpenPanel,IPanelItem
         });
 
 
+    }
+
+
+
+    void Send(AvoidControll_E ace,int _index = -1)
+    {
+        QMsg useravoidmsg = new AvoidMsg() { EventID = (int)Avoid_E.Begin,controllmode = ace,index = _index};
+        AvoidManager.Instance.SendMsg(useravoidmsg);
     }
 
 }

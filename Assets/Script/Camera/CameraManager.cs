@@ -40,6 +40,11 @@ public class CameraManager : QMgrBehaviour,ISingleton
         SendMsg(Normalmsg);
         QMsg Usermsg = new ModelMsg() { EventID = (int)Model_E.UserImport, modelevent = Model_E.SetCamera,selfcamera = camera.GetComponent<Camera>() };
         SendMsg(Usermsg);
+        QMsg normalPointmsg = new PointMsg() { EventID = (int)Point_E.Normal,controllmode = PointControll_E.SetCamra,selfcamra = camera.GetComponent<Camera>()};
+        SendMsg(normalPointmsg);
+        QMsg userPointmsg = new PointMsg() { EventID = (int)Point_E.Userimport, controllmode = PointControll_E.SetCamra, selfcamra = camera.GetComponent<Camera>() };
+        SendMsg(userPointmsg);
+
         RegetsSelfEvent();
     }
 
